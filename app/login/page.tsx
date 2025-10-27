@@ -40,6 +40,7 @@ export default function LoginPage() {
             Flamnora <span className="text-accent">✨</span>
           </h1>
           <p className="text-muted-foreground">Welcome back to luxury candles</p>
+          <p className="text-sm text-accent/80 italic mt-1">Developed by ArshXCoder</p>
         </div>
 
         {/* Card */}

@@ -35,8 +35,8 @@ export default function SignupPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background flex flex-col justify-between px-4 py-12">
+        <div className="w-full max-w-md mx-auto">
           <div className="bg-white/50 backdrop-blur-sm border border-border rounded-2xl shadow-xl p-8">
             <h1 className="font-serif text-3xl font-bold text-center mb-2 text-primary">Join Flamnora</h1>
             <p className="text-center text-foreground/60 mb-8">Create your account to get started</p>
@@ -98,6 +98,11 @@ export default function SignupPage() {
               </Link>
             </p>
           </div>
+        </div>
+        <div className="absolute bottom-8 left-0 right-0 text-center">
+          <p className="inline-block bg-white/10 backdrop-blur-sm px-6 py-2 rounded-full text-sm font-medium italic text-white shadow-lg">
+            Developed by ArshXCoder
+          </p>
         </div>
       </div>
     </>
