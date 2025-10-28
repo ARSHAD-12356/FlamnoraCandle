@@ -51,7 +51,7 @@ export default function LoginPage() {
             <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">{error}</div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
             {/* Email Field */}
             <div>
               <label className="block text-sm font-semibold text-foreground mb-2">Email Address</label>
@@ -63,6 +63,8 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground transition-all"
                   placeholder="you@example.com"
+                  autoComplete="off"
+                  data-form-type="other"
                   required
                 />
               </div>
@@ -78,10 +80,17 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground transition-all"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
+                  autoComplete="new-password"
+                  data-form-type="other"
                   required
                 />
               </div>
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <Link href="/forgot-password" className="text-primary hover:text-accent font-semibold hover:underline text-sm">Forgot password?</Link>
             </div>
 
           {/* Submit Button */}
@@ -97,9 +106,9 @@ export default function LoginPage() {
 
         </form>
 
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
-            <span className="text-sm text-foreground">New to Flamnora?{" "}</span>
+          {/* Links */}
+          <div className="mt-6 text-center text-sm">
+            <span className="text-foreground">New to Flamnora?{" "}</span>
             <Link
               href="/signup"
               className="text-primary hover:text-accent font-semibold hover:underline"

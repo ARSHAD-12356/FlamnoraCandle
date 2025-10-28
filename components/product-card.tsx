@@ -34,8 +34,8 @@ export default function ProductCard({ product, isPremium }: ProductCardProps) {
   const handleBuyNow = () => {
     // Check if user is signed in
     if (!user) {
-      // Redirect to signup page if not signed in
-      router.push("/signup")
+      // Redirect to login page if not signed in
+      router.push("/login")
       return
     }
 
