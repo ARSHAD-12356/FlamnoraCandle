@@ -2,7 +2,9 @@
 
 import { ShoppingCart, Eye } from "lucide-react"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useCart } from "@/context/cart-context"
+import { useAuth } from "@/context/auth-context"
 import ProductDetailsModal from "./product-details-modal"
 
 interface ProductCardProps {
@@ -14,6 +16,8 @@ export default function ProductCard({ product, isPremium }: ProductCardProps) {
   const [showDetails, setShowDetails] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
   const { addToCart } = useCart()
+  const { user } = useAuth()
+  const router = useRouter()
 
   const handleAddToCart = () => {
     addToCart({
@@ -28,6 +32,14 @@ export default function ProductCard({ product, isPremium }: ProductCardProps) {
   }
 
   const handleBuyNow = () => {
+    // Check if user is signed in
+    if (!user) {
+      // Redirect to signup page if not signed in
+      router.push("/signup")
+      return
+    }
+
+    // User is signed in, proceed with Buy Now flow
     addToCart({
       id: product.id || product.name,
       name: product.name,

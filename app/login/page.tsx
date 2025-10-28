@@ -32,27 +32,23 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background flex flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md mb-8">
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="font-serif text-4xl font-bold text-primary mb-2">
             Flamnora <span className="text-accent">✨</span>
           </h1>
-          <p className="text-muted-foreground">Welcome back to luxury candles</p>
-          <p className="text-sm text-accent/80 italic mt-1">Developed by ArshXCoder</p>
+          <p className="text-foreground">Welcome back to luxury candles</p>
         </div>
 
         {/* Card */}
-        <div className="dark:bg-gray-900/80 bg-white/50 backdrop-blur-sm border border-border rounded-2xl shadow-2xl p-8">
+        <div className="bg-card border border-border rounded-2xl shadow-2xl p-8">
           <h2 className="font-serif text-2xl font-bold text-center mb-2 text-foreground">Sign In</h2>
           <p className="text-center text-muted-foreground mb-8">Access your Flamnora account</p>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-200 text-sm flex items-start gap-3">
-              <span className="text-lg">⚠️</span>
-              <span>{error}</span>
-            </div>
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">{error}</div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -65,7 +61,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background transition-all"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground transition-all"
                   placeholder="you@example.com"
                   required
                 />
@@ -81,7 +77,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background transition-all"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground transition-all"
                   placeholder="••••••••"
                   required
                 />
@@ -92,7 +88,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary hover:bg-accent text-primary-foreground py-2.5 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 hover:shadow-lg"
+            className="w-full bg-primary hover:bg-accent text-primary-foreground py-3 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98]"
           >
             {isLoading ? "Signing in..." : "Sign In"}
             {!isLoading && <ArrowRight size={18} />}
@@ -102,8 +98,8 @@ export default function LoginPage() {
         </form>
 
           {/* Sign Up Link */}
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <span className="text-sm text-muted-foreground">New to Flamnora?</span>
+          <div className="mt-6 text-center">
+            <span className="text-sm text-foreground">New to Flamnora?{" "}</span>
             <Link
               href="/signup"
               className="text-primary hover:text-accent font-semibold hover:underline"
@@ -112,13 +108,12 @@ export default function LoginPage() {
             </Link>
           </div>
         </div>
+      </div>
 
-        {/* Footer */}
-        <p className="text-center text-muted-foreground text-sm mt-6">
-          By signing in, you agree to our{" "}
-          <Link href="#" className="text-primary hover:underline">
-            Terms of Service
-          </Link>
+      {/* Developer Credit - Below the Login Card */}
+      <div className="mt-4 text-center">
+        <p className="inline-block bg-muted/80 backdrop-blur-sm px-6 py-3 rounded-full text-sm font-medium text-foreground/80 shadow-md border border-border">
+          Developed by <span className="font-semibold text-primary">ArshXCoder</span>
         </p>
       </div>
     </div>

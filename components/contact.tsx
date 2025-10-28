@@ -46,7 +46,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                <p className="text-muted-foreground">hello@flamnora.com</p>
+                <p className="text-muted-foreground">Flamnoracandles456@gmail.com</p>
               </div>
             </div>
 
@@ -58,7 +58,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground mb-1">Phone</h3>
-                <p className="text-muted-foreground">+91 (555) 123-4567</p>
+                <p className="text-muted-foreground">+91 9122827788</p>
               </div>
             </div>
 
@@ -70,7 +70,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground mb-1">Address</h3>
-                <p className="text-muted-foreground">123 Candle Lane, Artisan City, AC 12345</p>
+                <p className="text-muted-foreground">New godam, Piparpati, Gaya</p>
               </div>
             </div>
           </div>

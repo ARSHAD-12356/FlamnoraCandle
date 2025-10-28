@@ -1,7 +1,9 @@
 "use client"
 
 import { X, ShoppingCart, Heart, CreditCard } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useCart } from "@/context/cart-context"
+import { useAuth } from "@/context/auth-context"
 
 interface ProductDetailsModalProps {
   product: any
@@ -11,6 +13,8 @@ interface ProductDetailsModalProps {
 
 export default function ProductDetailsModal({ product, isPremium, onClose }: ProductDetailsModalProps) {
   const { addToCart } = useCart()
+  const { user } = useAuth()
+  const router = useRouter()
 
   const handleAddToCart = () => {
     addToCart({
@@ -24,6 +28,15 @@ export default function ProductDetailsModal({ product, isPremium, onClose }: Pro
   }
 
   const handleBuyNow = () => {
+    // Check if user is signed in
+    if (!user) {
+      onClose()
+      // Redirect to signup page if not signed in
+      router.push("/signup")
+      return
+    }
+
+    // User is signed in, proceed with Buy Now flow
     addToCart({
       id: product.id || product.name,
       name: product.name,

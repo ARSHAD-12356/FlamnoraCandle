@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="candleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="flameGradient" cx="50%" cy="30%" r="50%">
+      <stop offset="0%" style="stop-color:#fef3c7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </radialGradient>
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:#e5e7eb;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Candle Container/Glass -->
+  <rect x="35" y="50" width="30" height="40" rx="3" fill="#ffffff" opacity="0.2" stroke="#e5e7eb" stroke-width="1.5"/>
+  <rect x="38" y="52" width="24" height="35" rx="2" fill="url(#glassGradient)"/>
+  
+  <!-- Candle Wax (gradient) -->
+  <rect x="38" y="52" width="24" height="35" rx="2" fill="url(#candleGradient)"/>
+  
+  <!-- Wick -->
+  <line x1="50" y1="45" x2="50" y2="52" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Flame -->
+  <ellipse cx="50" cy="38" rx="6" ry="10" fill="url(#flameGradient)"/>
+  <ellipse cx="50" cy="35" rx="4" ry="8" fill="#fef3c7"/>
+  <ellipse cx="50" cy="32" rx="2" ry="4" fill="#ffffff"/>
+  
+  <!-- Sparkles/Stars for premium feel -->
+  <circle cx="25" cy="20" r="2" fill="#fbbf24" opacity="0.9">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="75" cy="25" r="1.5" fill="#f59e0b" opacity="0.8">
+    <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="20" cy="75" r="1.5" fill="#dc2626" opacity="0.7">
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="80" cy="70" r="2" fill="#fbbf24" opacity="0.8">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.3s" repeatCount="indefinite"/>
+  </circle>
+</svg>

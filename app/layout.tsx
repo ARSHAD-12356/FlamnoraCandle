@@ -19,11 +19,9 @@ const playfair = Playfair_Display({
   variable: "--font-serif",
 })
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Flamnora - Premium Handcrafted Candles",
-  description:
-    "Discover luxury handcrafted candles made with love and premium soy wax. Explore our premium and local candle collections.",
-  generator: "v0.app",
+  description: "Discover luxury handcrafted candles made with love and premium soy wax. Explore our premium and local candle collections.",
 }
 
 export default function RootLayout({

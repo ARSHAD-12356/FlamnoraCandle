@@ -147,3 +147,4 @@ Your Flamnora e-commerce app is now:
 **Just seed the products and everything will work!** 🚀
 
 
+
