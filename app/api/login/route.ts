@@ -4,15 +4,8 @@ import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
-// Define User Schema and Model (same as signup)
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
-
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+// Import the User model
+import User from "@/models/User";
 
 export async function POST(req: Request) {
   try {
@@ -51,7 +44,10 @@ export async function POST(req: Request) {
       user: {
         id: user._id.toString(),
         name: user.name,
-        email: user.email
+        email: user.email,
+        phone: user.phone || '',
+        address: user.address || '',
+        avatar: user.avatar || ''
       }
     }, { status: 200 });
   } catch (error) {

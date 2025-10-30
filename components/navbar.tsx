@@ -32,10 +32,10 @@ export default function Navbar() {
 
   const navLinks = [
     { label: "Home", href: "/" },
-    { label: "Premium Candles", href: "#premium-candles", isScroll: true },
-    { label: "Local Candles", href: "#local-candles", isScroll: true },
-    { label: "About", href: "#about", isScroll: true },
-    { label: "Contact", href: "#contact", isScroll: true },
+    { label: "Premium Candles", href: "/premium-candles" },
+    { label: "Local Candles", href: "/local-candles" },
+    { label: "About", href: "/#about", isScroll: true },
+    { label: "Contact", href: "/#contact", isScroll: true },
   ]
 
   // Search functionality with debouncing
@@ -141,17 +141,23 @@ export default function Navbar() {
             {showNavMenu && (
               <div className="hidden md:flex items-center gap-8">
                 {navLinks.map((link) => (
-                  <button
-                    key={link.href}
-                    onClick={() => handleNavClick(link.href, link.isScroll || false)}
-                    className="text-foreground hover:text-primary transition-colors duration-300 text-sm font-medium"
-                  >
-                    {link.isScroll ? (
-                      <span className="cursor-pointer">{link.label}</span>
-                    ) : (
-                      <Link href={link.href}>{link.label}</Link>
-                    )}
-                  </button>
+                  link.isScroll ? (
+                    <button
+                      key={link.href}
+                      onClick={() => handleNavClick(link.href, true)}
+                      className="text-foreground hover:text-primary transition-colors duration-300 text-sm font-medium cursor-pointer"
+                    >
+                      {link.label}
+                    </button>
+                  ) : (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-foreground hover:text-primary transition-colors duration-300 text-sm font-medium"
+                    >
+                      {link.label}
+                    </Link>
+                  )
                 ))}
               </div>
             )}
@@ -282,16 +288,27 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Navigation - Only show if authenticated */}
-          {isOpen && showNavMenu && (
+            {isOpen && showNavMenu && (
             <div className="md:hidden pb-4 space-y-2 animate-fade-in">
               {navLinks.map((link) => (
-                <button
-                  key={link.href}
-                  onClick={() => handleNavClick(link.href, link.isScroll || false)}
-                  className="w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors duration-300"
-                >
-                  {link.isScroll ? <span>{link.label}</span> : <Link href={link.href}>{link.label}</Link>}
-                </button>
+                link.isScroll ? (
+                  <button
+                    key={link.href}
+                    onClick={() => handleNavClick(link.href, true)}
+                    className="w-full text-left px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors duration-300"
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="block px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors duration-300"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                )
               ))}
               {user && (
                 <>

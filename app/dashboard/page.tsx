@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useAuth, type Order } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Navbar from "@/components/navbar"
 import { Mail, Phone, MapPin, Package, Calendar, Edit2, Check, X, Star, TrendingUp } from "lucide-react"
 import Link from "next/link"
@@ -28,6 +28,9 @@ export default function DashboardPage() {
     phone: "",
     address: "",
   })
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [orders, setOrders] = useState<any[]>([])
   const [totalSpent, setTotalSpent] = useState(0)
   const [memberSince, setMemberSince] = useState("")
@@ -43,10 +46,25 @@ export default function DashboardPage() {
       phone: user.phone || "",
       address: user.address || "",
     })
+    // initialize avatar preview from user profile if available
+    setAvatarPreview((user as any).avatar || (user as any).photoURL || null)
 
     // Fetch real orders from MongoDB
     fetchOrders()
   }, [user, router])
+
+  // Revoke object URL when avatarPreview changes to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      try {
+        if (avatarPreview && avatarPreview.startsWith("blob:")) {
+          URL.revokeObjectURL(avatarPreview)
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [avatarPreview])
 
   // Define image map outside of the function to prevent recreating on each render
   const PRODUCT_IMAGE_MAP: { [key: string]: string } = {
@@ -94,14 +112,32 @@ export default function DashboardPage() {
     }
   }
 
-  const handleUpdateProfile = (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
-    updateProfile({
-      name: formData.name,
-      phone: formData.phone,
-      address: formData.address,
-    })
-    setIsEditing(false)
+    try {
+      const payload: any = {
+        name: formData.name,
+        phone: formData.phone,
+        address: formData.address,
+      }
+      
+      // Only include the file if a new one was selected
+      if (avatarFile) {
+        payload.avatarFile = avatarFile
+      }
+      
+      await updateProfile(payload)
+      setIsEditing(false)
+      
+      // Clean up the preview URL if it was created
+      if (avatarPreview && avatarPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(avatarPreview)
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error)
+      // You might want to show an error message to the user here
+      alert('Failed to update profile. Please try again.')
+    }
   }
 
   if (!user) {
@@ -186,15 +222,94 @@ export default function DashboardPage() {
                   )}
                 </div>
 
+                {/* Hidden file input always present so both view/edit can trigger it */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.gif,.webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // Validate file size (max 5MB)
+                      if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be less than 5MB');
+                        return;
+                      }
+
+                      // Validate file type
+                      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                      if (!validTypes.includes(file.type)) {
+                        alert('Please select a valid image file (JPEG, PNG, GIF, or WEBP)');
+                        return;
+                      }
+
+                      // Create preview immediately
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        setAvatarPreview(ev.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+
+                      // Set the file but don't save it yet - wait for user to click Save
+                      setAvatarFile(file);
+                    }
+                  }}
+                />
+
                 {!isEditing ? (
                   <div className="space-y-6">
                     {/* Profile Avatar - Enhanced */}
                     <div className="flex justify-center mb-6">
                       <div className="relative">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary via-accent to-primary flex items-center justify-center text-white font-serif text-3xl font-bold shadow-xl">
-                          {user.name.charAt(0).toUpperCase()}
+                        {avatarPreview || (user as any).avatar || (user as any).photoURL ? (
+                          <img
+                            src={avatarPreview || (user as any).avatar || (user as any).photoURL}
+                            alt="avatar"
+                            className="w-24 h-24 rounded-full object-cover border-2 border-white shadow-xl"
+                          />
+                        ) : (
+                          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary via-accent to-primary flex items-center justify-center text-white font-serif text-3xl font-bold shadow-xl">
+                            {user.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+
+                        <div className="absolute bottom-0 right-0 flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="bg-primary p-2 rounded-full border-4 border-white shadow-lg text-white hover:opacity-90 transition-all duration-300"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                              <polyline points="17 21 17 13 7 13 7 21" />
+                              <polyline points="7 3 7 8 15 8" />
+                            </svg>
+                          </button>
+                          {avatarPreview && avatarFile && (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                await handleUpdateProfile({ preventDefault: () => {} } as any);
+                                // Clear the file and preview after successful update
+                                setAvatarFile(null);
+                              }}
+                              className="bg-green-500 p-2 rounded-full border-4 border-white shadow-lg text-white hover:opacity-90 transition-all duration-300"
+                            >
+                              <Check size={16} />
+                            </button>
+                          )}
                         </div>
-                        <div className="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-white shadow-lg"></div>
                       </div>
                     </div>
 
@@ -244,6 +359,40 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleUpdateProfile} className="space-y-4">
+                    {/* Avatar upload (edit) */}
+                    <div>
+                      <label className="block text-sm font-bold text-foreground mb-2 uppercase tracking-wide">Profile Picture</label>
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-full overflow-hidden bg-black/10 border border-white/10">
+                          {avatarPreview ? (
+                            // preview image
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={avatarPreview} alt="preview" className="w-full h-full object-cover" />
+                          ) : (user as any).avatar || (user as any).photoURL ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={(user as any).avatar || (user as any).photoURL} alt="avatar" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xl font-bold text-white bg-gradient-to-br from-primary via-accent to-primary">{user.name.charAt(0).toUpperCase()}</div>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-3 py-2 bg-primary text-white rounded-lg"
+                          >
+                            Choose
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setAvatarFile(null); setAvatarPreview(null); }}
+                            className="px-3 py-2 bg-muted text-foreground rounded-lg"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                     <div>
                       <label className="block text-sm font-bold text-foreground mb-2 uppercase tracking-wide">
                         Name

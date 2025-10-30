@@ -7,8 +7,10 @@ export interface User {
   id: string
   email: string
   name: string
-  phone?: string
-  address?: string
+  phone: string
+  address: string
+  avatar: string
+  photoURL?: string  // for backward compatibility
 }
 
 export interface Order {
@@ -29,7 +31,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   signup: (email: string, password: string, name: string) => Promise<void>
   logout: () => void
-  updateProfile: (data: Partial<User>) => void
+  updateProfile: (data: Partial<User> & { avatarFile?: File }) => Promise<User | void>
   setAuthUser: (user: User | null) => void
 }
 
@@ -77,6 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       id: data.user.id,
       email: data.user.email,
       name: data.user.name,
+      phone: data.user.phone || '',
+      address: data.user.address || '',
+      avatar: data.user.avatar || ''
     }
 
     setUser(newUser)
@@ -117,6 +122,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       id: data.user.id,
       email: data.user.email,
       name: data.user.name,
+      phone: data.user.phone || '',
+      address: data.user.address || '',
+      avatar: data.user.avatar || ''
     }
 
     setUser(newUser)
@@ -132,11 +140,81 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("flamnora_token")
   }
 
-  const updateProfile = (data: Partial<User>) => {
+  const updateProfile = async (data: Partial<User> & { avatarFile?: File }) => {
     if (user) {
-      const updatedUser = { ...user, ...data }
-      setUser(updatedUser)
-      localStorage.setItem("flamnora_user", JSON.stringify(updatedUser))
+      let avatarUrl = data.avatar;
+
+      // If there's a file to upload
+      if (data.avatarFile) {
+        try {
+          const formData = new FormData();
+          formData.append('file', data.avatarFile);
+
+          const response = await fetch('/api/profile/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to upload profile picture');
+          }
+
+          const result = await response.json();
+          avatarUrl = result.url;
+        } catch (error) {
+          console.error('Error uploading profile picture:', error);
+          throw error;
+        }
+      }
+
+      // Prepare update data
+      const updateData = {
+        ...data,
+        avatar: avatarUrl || user.avatar
+      };
+
+      try {
+        // Get token from localStorage
+        const token = localStorage.getItem('flamnora_token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        // Update profile on server
+        const response = await fetch('/api/profile/update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updateData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update profile on server');
+        }
+
+        const result = await response.json();
+        
+        // Get the updated user from the server response
+        const updatedUserData = result.user;
+        
+        // Update local state with server response data
+        if (!result?.user) {
+          throw new Error('Server did not return updated user data');
+        }
+        
+        const updatedUser = {
+          ...user,
+          ...result.user,  // Use the server's response instead of local data
+        };        setUser(updatedUser);
+        localStorage.setItem("flamnora_user", JSON.stringify(updatedUser));
+
+        return updatedUser;
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        throw error;
+      }
     }
   }
 
