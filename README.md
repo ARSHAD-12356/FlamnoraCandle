@@ -1,3 +1,14 @@
+## 🖼️ Project Screenshots
+Here’s a preview of the live website 👇  
+
+<p align="center">
+  <img src="./assets/FL1.png" width="800" alt="Homepage Screenshot" />
+  <img src="./assets/FL2.png" width="800" alt="Product Page Screenshot" />
+  <img src="./assets/FL3.png" width="800" alt="Cart Page Screenshot" />
+  <img src="./assets/FL4.png" width="800" alt="Payment Page Screenshot" />
+  <img src="./assets/FL 5.png" width="800" alt="Payment Page Screenshot" />
+  <img src="./assets/FL6.png" width="800" alt="Payment Page Screenshot" />
+</p>
 🕯️ Project Overview
 
 Flamnora is a full-stack e-commerce website designed for selling premium handcrafted candles.
@@ -73,15 +84,5 @@ Md Arshad Raza
 🛒 Real-time orders and user dashboard implemented successfully.
 
 
-## 🖼️ Project Screenshots
-Here’s a preview of the live website 👇  
 
-<p align="center">
-  <img src="./assets/FL1.png" width="800" alt="Homepage Screenshot" />
-  <img src="./assets/FL2.png" width="800" alt="Product Page Screenshot" />
-  <img src="./assets/FL3.png" width="800" alt="Cart Page Screenshot" />
-  <img src="./assets/FL4.png" width="800" alt="Payment Page Screenshot" />
-  <img src="./assets/FL 5.png" width="800" alt="Payment Page Screenshot" />
-  <img src="./assets/FL6.png" width="800" alt="Payment Page Screenshot" />
-</p>
 
