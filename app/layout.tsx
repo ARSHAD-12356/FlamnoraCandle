@@ -19,9 +19,17 @@ const playfair = Playfair_Display({
   variable: "--font-serif",
 })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Flamnora - Premium Handcrafted Candles",
-  description: "Discover luxury handcrafted candles made with love and premium soy wax. Explore our premium and local candle collections.",
+  description:
+    "Discover luxury handcrafted candles made with love and premium soy wax. Explore our premium and local candle collections.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.svg",
+  },
 }
 
 export default function RootLayout({
