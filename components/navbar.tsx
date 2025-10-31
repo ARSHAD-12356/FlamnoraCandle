@@ -32,8 +32,8 @@ export default function Navbar() {
 
   const navLinks = [
     { label: "Home", href: "/" },
-    { label: "Premium Candles", href: "/premium-candles" },
-    { label: "Local Candles", href: "/local-candles" },
+    { label: "Premium Candles", href: "/#premium-candles", isScroll: true },
+    { label: "Local Candles", href: "/#local-candles", isScroll: true },
     { label: "About", href: "/#about", isScroll: true },
     { label: "Contact", href: "/#contact", isScroll: true },
   ]
@@ -115,8 +115,20 @@ export default function Navbar() {
 
   const handleNavClick = (href: string, isScroll: boolean) => {
     if (isScroll) {
-      const element = document.getElementById(href.substring(1))
-      element?.scrollIntoView({ behavior: "smooth" })
+      // If on dashboard or another page, navigate to home first
+      if (pathname !== "/") {
+        router.push("/")
+        // Wait for navigation, then scroll to section
+        setTimeout(() => {
+          const elementId = href.replace("/#", "")
+          const element = document.getElementById(elementId)
+          element?.scrollIntoView({ behavior: "smooth" })
+        }, 100)
+      } else {
+        const elementId = href.replace("/#", "")
+        const element = document.getElementById(elementId)
+        element?.scrollIntoView({ behavior: "smooth" })
+      }
       setIsOpen(false)
     }
   }
@@ -131,7 +143,15 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link href="/" className="flex-shrink-0">
+            <Link 
+              href="/" 
+              className="flex-shrink-0"
+              onClick={() => {
+                if (pathname === "/") {
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }
+              }}
+            >
               <h1 className="font-serif text-2xl font-bold text-primary">
                 Flamnora <span className="text-accent">✨</span>
               </h1>

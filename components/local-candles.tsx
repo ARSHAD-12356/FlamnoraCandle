@@ -21,7 +21,7 @@ export default function LocalCandles() {
       waxType: "Soy Wax",
       moq: "30 Pcs",
       weight: "80g",
-      price: "₹1",
+      price: "₹40",
       image: "/small-bubble-candle-craft.jpg",
       description:
         "Compact and charming, our Small Bubble Candle is ideal for gifting or creating a cozy corner. Handcrafted with love and attention to detail.",
