@@ -17,7 +17,7 @@ The project is now fully production-ready and live on Vercel.
 
 🌐 Live Links
 
-Frontend: https://flamnoracandle.vercel.app
+Full Stack : https://flamnoracandle.vercel.app
 
 Backend: Hosted on Render
 Database: MongoDB Atlas
