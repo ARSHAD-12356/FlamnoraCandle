@@ -5,6 +5,8 @@ const orderSchema = new mongoose.Schema({
     userId: { type: String, required: false }, // Will store user ID from session
     name: { type: String, required: false },
     email: { type: String, required: false },
+    phone: { type: String, required: false },
+    address: { type: String, required: false },
   },
   products: [
     {

@@ -1,6 +1,6 @@
 "use client"
 
-import { X, Trash2, Plus, Minus, CreditCard, Smartphone, Loader, Check, Truck } from "lucide-react"
+import { X, Trash2, Plus, Minus, CreditCard, Smartphone, Loader, Check, Truck, User, Mail, MapPin, Phone, ArrowLeft } from "lucide-react"
 import { useCart } from "@/context/cart-context"
 import { useAuth } from "@/context/auth-context"
 import { useState, useEffect } from "react"
@@ -15,15 +15,22 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   const { user } = useAuth()
   const [paymentMethod, setPaymentMethod] = useState<string>("upi")
   const [showCheckout, setShowCheckout] = useState(false)
+  const [showCustomerDetails, setShowCustomerDetails] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [customerDetails, setCustomerDetails] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    address: user?.address || "",
+  })
 
-  // Auto-show checkout when opened after Buy Now
+  // Auto-show customer details when opened after Buy Now
   useEffect(() => {
     const handleBuyNowClick = () => {
       if (isOpen && cart.length > 0) {
-        setShowCheckout(true)
+        setShowCustomerDetails(true)
       }
     }
     
@@ -35,6 +42,18 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
     }
   }, [isOpen, cart.length])
 
+  // Update customer details when user changes
+  useEffect(() => {
+    if (user) {
+      setCustomerDetails({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        address: user.address || "",
+      })
+    }
+  }, [user])
+
   if (!isOpen) return null
 
   const paymentMethods = [
@@ -45,9 +64,51 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
     { id: "cod", name: "Cash on Delivery", icon: Truck, description: "Pay when delivered" },
   ]
 
+  const handleSaveCustomerDetails = () => {
+    // Validate required fields
+    if (!customerDetails.name || !customerDetails.email || !customerDetails.phone || !customerDetails.address) {
+      alert("Please fill in all customer details (Name, Email, Phone, Address)")
+      return
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(customerDetails.email)) {
+      alert("Please enter a valid email address")
+      return
+    }
+    
+    // Phone validation (basic)
+    const phoneRegex = /^[0-9]{10}$/
+    if (!phoneRegex.test(customerDetails.phone.replace(/\D/g, ""))) {
+      alert("Please enter a valid 10-digit phone number")
+      return
+    }
+    
+    // Proceed to payment method selection
+    setShowCustomerDetails(false)
+    setShowCheckout(true)
+  }
+
   const handleCheckout = async () => {
-    console.log("Starting payment process...", { paymentMethod, cartTotal, cart })
+    console.log("Starting payment process...", { paymentMethod, cartTotal, cart, customerDetails })
     setIsProcessing(true)
+    
+    // Prepare user data with customer details
+    const userData = user 
+      ? { 
+          userId: user.id, 
+          name: customerDetails.name || user.name, 
+          email: customerDetails.email || user.email,
+          phone: customerDetails.phone || user.phone || "",
+          address: customerDetails.address || user.address || "",
+        }
+      : { 
+          name: customerDetails.name || "Guest", 
+          email: customerDetails.email || "guest@example.com",
+          phone: customerDetails.phone || "",
+          address: customerDetails.address || "",
+        }
     
     // Handle COD (Cash on Delivery) separately
     if (paymentMethod === "cod") {
@@ -57,7 +118,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            user: user ? { userId: user.id, name: user.name, email: user.email } : { name: "Guest", email: "guest@example.com" },
+            user: userData,
             products: cart.map(item => ({
               productId: item.id,
               name: item.name,
@@ -125,7 +186,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                user: user ? { userId: user.id, name: user.name, email: user.email } : { name: "Guest", email: "guest@example.com" },
+                user: userData,
                 products: cart.map(item => ({
                   productId: item.id,
                   name: item.name,
@@ -181,7 +242,13 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
 
   const handleBackToCart = () => {
     setShowCheckout(false)
+    setShowCustomerDetails(false)
     setPaymentMethod("upi") // Reset to default
+  }
+
+  const handleBackToCustomerDetails = () => {
+    setShowCheckout(false)
+    setShowCustomerDetails(true)
   }
 
   return (
@@ -212,65 +279,153 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
           </button>
         </div>
 
-        {/* Items */}
+        {/* Items / Delivery Details Form */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {cart.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <p className="text-muted-foreground text-lg mb-2">Your cart is empty</p>
-              <p className="text-muted-foreground text-sm">Add some beautiful candles to get started!</p>
-            </div>
-          ) : (
-            cart.map((item, index) => (
-              <div key={`${item.id}-${index}`} className="flex gap-4 p-4 bg-muted rounded-lg">
-                <img
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.name}
-                  className="w-20 h-20 object-cover rounded-lg"
-                />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground">{item.name}</h3>
-                  <p className="text-primary font-bold">{item.price}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="p-1 hover:bg-background rounded transition-colors"
-                    >
-                      <Minus size={16} className="text-foreground" />
-                    </button>
-                    <span className="text-foreground font-semibold w-6 text-center">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="p-1 hover:bg-background rounded transition-colors"
-                    >
-                      <Plus size={16} className="text-foreground" />
-                    </button>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="ml-auto p-1 hover:bg-red-100 rounded transition-colors"
-                    >
-                      <Trash2 size={16} className="text-red-500" />
-                    </button>
+          {!showCustomerDetails && !showCheckout ? (
+            cart.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <p className="text-muted-foreground text-lg mb-2">Your cart is empty</p>
+                <p className="text-muted-foreground text-sm">Add some beautiful candles to get started!</p>
+              </div>
+            ) : (
+              cart.map((item, index) => (
+                <div key={`${item.id}-${index}`} className="flex gap-4 p-4 bg-muted rounded-lg">
+                  <img
+                    src={item.image || "/placeholder.svg"}
+                    alt={item.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">{item.name}</h3>
+                    <p className="text-primary font-bold">{item.price}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="p-1 hover:bg-background rounded transition-colors"
+                      >
+                        <Minus size={16} className="text-foreground" />
+                      </button>
+                      <span className="text-foreground font-semibold w-6 text-center">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="p-1 hover:bg-background rounded transition-colors"
+                      >
+                        <Plus size={16} className="text-foreground" />
+                      </button>
+                      <button
+                        onClick={() => removeFromCart(item.id)}
+                        className="ml-auto p-1 hover:bg-red-100 rounded transition-colors"
+                      >
+                        <Trash2 size={16} className="text-red-500" />
+                      </button>
+                    </div>
                   </div>
                 </div>
+              ))
+            )
+          ) : showCustomerDetails ? (
+            <div className="space-y-4">
+              <p className="font-semibold text-foreground text-sm uppercase tracking-wide mb-4">Delivery Details</p>
+              
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                    <User size={16} />
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={customerDetails.name}
+                    onChange={(e) => setCustomerDetails({ ...customerDetails, name: e.target.value })}
+                    placeholder="Enter your full name"
+                    className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                    <Mail size={16} />
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    value={customerDetails.email}
+                    onChange={(e) => setCustomerDetails({ ...customerDetails, email: e.target.value })}
+                    placeholder="Enter your email"
+                    className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                    <Phone size={16} />
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    value={customerDetails.phone}
+                    onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
+                    placeholder="Enter your phone number"
+                    className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                    <MapPin size={16} />
+                    Delivery Address *
+                  </label>
+                  <textarea
+                    value={customerDetails.address}
+                    onChange={(e) => setCustomerDetails({ ...customerDetails, address: e.target.value })}
+                    placeholder="Enter your complete delivery address"
+                    rows={3}
+                    className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 resize-none"
+                    required
+                  />
+                </div>
               </div>
-            ))
-          )}
+            </div>
+          ) : null}
         </div>
 
         {/* Footer */}
         {cart.length > 0 && (
-          <div className="border-t border-border p-6 space-y-4">
-            {!showCheckout ? (
+          <div className="border-t border-border p-6 space-y-4 bg-background">
+            {!showCustomerDetails && !showCheckout ? (
               <>
                 <div className="flex justify-between items-center">
                   <span className="text-foreground font-semibold">Total:</span>
                   <span className="text-2xl font-bold text-primary">₹{cartTotal.toFixed(2)}</span>
                 </div>
                 <button
-                  onClick={() => setShowCheckout(true)}
+                  onClick={() => setShowCustomerDetails(true)}
+                  className="w-full bg-primary hover:bg-accent text-primary-foreground py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
+                >
+                  Proceed
+                </button>
+              </>
+            ) : showCustomerDetails ? (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-foreground font-semibold">Total:</span>
+                  <span className="text-2xl font-bold text-primary">₹{cartTotal.toFixed(2)}</span>
+                </div>
+                <button
+                  onClick={handleSaveCustomerDetails}
                   className="w-full bg-primary hover:bg-accent text-primary-foreground py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
                 >
                   Proceed to Checkout
+                </button>
+                <button
+                  onClick={handleBackToCart}
+                  className="w-full bg-muted hover:bg-muted/80 text-foreground py-2 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  <ArrowLeft size={16} />
+                  Back
                 </button>
               </>
             ) : (
@@ -339,10 +494,11 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                     )}
                   </button>
                   <button
-                    onClick={handleBackToCart}
-                    className="w-full bg-muted hover:bg-muted/80 text-foreground py-2 rounded-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+                    onClick={handleBackToCustomerDetails}
+                    className="w-full bg-muted hover:bg-muted/80 text-foreground py-2 rounded-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                   >
-                    Back to Cart
+                    <ArrowLeft size={16} />
+                    Back
                   </button>
                 </div>
               </>

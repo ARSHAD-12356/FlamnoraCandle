@@ -258,19 +258,21 @@ export default function Navbar() {
                 </>
               )}
 
+              {/* Theme Toggle - Always visible */}
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="p-2 hover:bg-muted rounded-lg transition-colors duration-300"
+                title={mounted && theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {mounted && theme === "dark" ? (
+                  <Sun size={20} className="text-foreground" />
+                ) : (
+                  <Moon size={20} className="text-foreground" />
+                )}
+              </button>
+
               {user ? (
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="p-2 hover:bg-muted rounded-lg transition-colors duration-300"
-                    title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-                  >
-                    {mounted && theme === "dark" ? (
-                      <Sun size={20} className="text-foreground" />
-                    ) : (
-                      <Moon size={20} className="text-foreground" />
-                    )}
-                  </button>
                   <Link
                     href="/dashboard"
                     className="p-2 hover:bg-muted rounded-lg transition-colors duration-300"
